@@ -1,0 +1,22 @@
+<resources>
+  <string name="app_name">CropifySample</string>
+  <string name="config_alt">Button to show cropify configurations</string>
+  <string name="crop_alt">Button to crop</string>
+  <string name="cropped_image_alt">Cropped image</string>
+  <string name="frame">Frame</string>
+  <string name="frame_color">Frame Color</string>
+  <string name="frame_alpha">Frame Alpha</string>
+  <string name="frame_width">Frame Width</string>
+  <string name="frame_aspect_ratio">Frame Aspect Ratio</string>
+  <string name="grid">Grid</string>
+  <string name="grid_color">Grid Color</string>
+  <string name="grid_alpha">Grid Alpha</string>
+  <string name="grid_width">Grid Width</string>
+  <string name="mask">Mask</string>
+  <string name="mask_color">Mask Color</string>
+  <string name="mask_alpha">Mask Alpha</string>
+  <string name="background">Background</string>
+  <string name="background_color">Background Color</string>
+  <string name="bitmap">Bitmap</string>
+  <string name="flexible">Flexible</string>
+</resources>
