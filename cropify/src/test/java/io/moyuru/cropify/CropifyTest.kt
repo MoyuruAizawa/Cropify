@@ -6,7 +6,7 @@ import androidx.compose.ui.geometry.Size
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-internal class CropifyKtTest {
+internal class CropifyTest {
 
   @Test
   fun calculateImagePosition() {
