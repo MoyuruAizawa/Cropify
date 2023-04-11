@@ -128,7 +128,7 @@ class MainActivity : ComponentActivity() {
 
     croppedImage?.let {
       Dialog(onDismissRequest = { croppedImage = null }) {
-        Image(bitmap = it, contentDescription = stringResource(id = R.string.cropped_image_alt),)
+        Image(bitmap = it, contentDescription = stringResource(id = R.string.cropped_image_alt))
       }
     }
   }
