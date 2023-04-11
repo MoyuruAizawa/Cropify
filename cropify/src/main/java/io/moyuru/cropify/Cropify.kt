@@ -65,21 +65,23 @@ fun Cropify(
   }
 }
 
-
 internal fun calculateImageDst(bitmap: ImageBitmap, canvasSize: Size): Rect {
-  val height: Float
-  val width: Float
-  if (bitmap.width > bitmap.height) {
-    height = canvasSize.width * (bitmap.height / bitmap.width.toFloat())
-    width = canvasSize.width
-  } else {
-    height = canvasSize.height
-    width = canvasSize.height * (bitmap.width / bitmap.height.toFloat())
-  }
+  val size = calculateImageSize(bitmap.width, bitmap.height, canvasSize)
+  return calculateImagePosition(size, canvasSize)
+}
+
+internal fun calculateImagePosition(imageSize: Size, canvasSize: Size): Rect {
   return Rect(
-    Offset((canvasSize.width - width) / 2, (canvasSize.height - height) / 2),
-    Size(width, height)
+    Offset((canvasSize.width - imageSize.width) / 2, (canvasSize.height - imageSize.height) / 2),
+    imageSize
   )
+}
+
+internal fun calculateImageSize(bitmapWidth: Int, bitmapHeight: Int, canvasSize: Size): Size {
+  return if (bitmapWidth > bitmapHeight)
+    Size(canvasSize.width * bitmapHeight / bitmapWidth.toFloat(), canvasSize.width)
+  else
+    Size(canvasSize.height, canvasSize.height * bitmapWidth / bitmapHeight.toFloat())
 }
 
 internal fun calculateFrameRect(
