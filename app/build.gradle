@@ -57,4 +57,5 @@ dependencies {
   implementation 'androidx.compose.material:material:1.4.1'
   implementation 'androidx.compose.material3:material3:1.1.0-beta01'
   debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+  testImplementation "org.junit.jupiter:junit-jupiter-api:5.4.2"
 }

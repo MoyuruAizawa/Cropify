@@ -1,0 +1,25 @@
+name: Vital Check
+on: push
+jobs:
+  test:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('cropify/build.gradle') }}-${{ hashFiles('build.gradle') }}-${{ hashFiles('settings.gradle') }}
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+
+      - uses: gradle/gradle-build-action@v2
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
+
+      - name: unit test
+        run: ./gradlew :cropify:testDebugUnitTest
