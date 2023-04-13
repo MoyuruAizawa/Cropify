@@ -45,7 +45,7 @@ fun Cropify(
   ) {
     LaunchedEffect(state.bitmap, option.frameAspectRatio, constraints) {
       val canvasSize = Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat())
-      state.imageRect = calculateImageDst(state.bitmap, canvasSize)
+      state.imageRect = calculateImagePosition(state.bitmap, canvasSize)
       state.frameRect = calculateFrameRect(state.imageRect, canvasSize, option.frameAspectRatio)
     }
     ImageCanvas(
@@ -65,23 +65,19 @@ fun Cropify(
   }
 }
 
-internal fun calculateImageDst(bitmap: ImageBitmap, canvasSize: Size): Rect {
-  val size = calculateImageSize(bitmap.width, bitmap.height, canvasSize)
-  return calculateImagePosition(size, canvasSize)
-}
-
-internal fun calculateImagePosition(imageSize: Size, canvasSize: Size): Rect {
+internal fun calculateImagePosition(bitmap: ImageBitmap, canvasSize: Size): Rect {
+  val imageSize = calculateImageSize(bitmap, canvasSize)
   return Rect(
     Offset((canvasSize.width - imageSize.width) / 2, (canvasSize.height - imageSize.height) / 2),
     imageSize
   )
 }
 
-internal fun calculateImageSize(bitmapWidth: Int, bitmapHeight: Int, canvasSize: Size): Size {
-  return if (bitmapWidth > bitmapHeight)
-    Size(canvasSize.width, canvasSize.width * bitmapHeight / bitmapWidth.toFloat())
+internal fun calculateImageSize(bitmap: ImageBitmap, canvasSize: Size): Size {
+  return if (bitmap.width > bitmap.height)
+    Size(canvasSize.width, canvasSize.width * bitmap.height / bitmap.width.toFloat())
   else
-    Size(canvasSize.height * bitmapWidth / bitmapHeight.toFloat(), canvasSize.height)
+    Size(canvasSize.height * bitmap.width / bitmap.height.toFloat(), canvasSize.height)
 }
 
 internal fun calculateFrameRect(
