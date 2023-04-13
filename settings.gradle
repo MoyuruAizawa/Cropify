@@ -12,6 +12,6 @@ dependencyResolutionManagement {
     mavenCentral()
   }
 }
-rootProject.name = "ComposeImageCropperSample"
+rootProject.name = "Cropify"
 include ':app'
 include ':cropify'
