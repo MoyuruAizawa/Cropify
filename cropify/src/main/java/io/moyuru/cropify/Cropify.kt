@@ -79,9 +79,9 @@ internal fun calculateImagePosition(imageSize: Size, canvasSize: Size): Rect {
 
 internal fun calculateImageSize(bitmapWidth: Int, bitmapHeight: Int, canvasSize: Size): Size {
   return if (bitmapWidth > bitmapHeight)
-    Size(canvasSize.width * bitmapHeight / bitmapWidth.toFloat(), canvasSize.width)
+    Size(canvasSize.width, canvasSize.width * bitmapHeight / bitmapWidth.toFloat())
   else
-    Size(canvasSize.height, canvasSize.height * bitmapWidth / bitmapHeight.toFloat())
+    Size(canvasSize.height * bitmapWidth / bitmapHeight.toFloat(), canvasSize.height)
 }
 
 internal fun calculateFrameRect(
