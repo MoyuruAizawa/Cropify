@@ -3,6 +3,9 @@ package io.moyuru.cropify
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ImageBitmap
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -10,31 +13,47 @@ internal class CropifyTest {
 
   @Test
   fun calculateImagePosition() {
+    val bitmap = mockk<ImageBitmap>()
+    every { bitmap.width } returns 1920
+    every { bitmap.height } returns 1080
+    val canvasSize = Size(1080f, 1920f)
+    val imageSize = calculateImageSize(bitmap, canvasSize)
+
     assertEquals(
-      Rect(50f, 100f, 250f, 300f),
+      Rect(
+        Offset(
+          (canvasSize.width - imageSize.width) / 2f,
+          (canvasSize.height - imageSize.height) / 2f
+        ),
+        imageSize
+      ),
       calculateImagePosition(
-        imageSize = Size(200f, 200f),
-        canvasSize = Size(300f, 400f)
+        bitmap = bitmap,
+        canvasSize = canvasSize
       )
     )
   }
 
   @Test
   fun calculateImageSize() {
+    val bitmap = mockk<ImageBitmap>()
+
+    every { bitmap.width } returns 1920
+    every { bitmap.height } returns 1080
     assertEquals(
       Size(1920f, 1080f),
       calculateImageSize(
-        bitmapWidth = 1920,
-        bitmapHeight = 1080,
+        bitmap = bitmap,
         canvasSize = Size(1920f, 1080f)
       )
     )
 
+    every { bitmap.width } returns 1080
+    every { bitmap.height } returns 1920
     assertEquals(
       Size(607.5f, 1080f),
       calculateImageSize(
-        bitmapWidth = 1080,
-        bitmapHeight = 1920,
+        bitmap = bitmap,
         canvasSize = Size(1920f, 1080f)
       ),
     )
