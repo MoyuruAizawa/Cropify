@@ -22,7 +22,7 @@ internal class CropifyTest {
   @Test
   fun calculateImageSize() {
     assertEquals(
-      Size(1080f, 1920f),
+      Size(1920f, 1080f),
       calculateImageSize(
         bitmapWidth = 1920,
         bitmapHeight = 1080,
@@ -31,7 +31,7 @@ internal class CropifyTest {
     )
 
     assertEquals(
-      Size(1080f, 607.5f),
+      Size(607.5f, 1080f),
       calculateImageSize(
         bitmapWidth = 1080,
         bitmapHeight = 1920,
