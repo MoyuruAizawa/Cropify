@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
     val res = LocalContext.current.resources
     val scaffoldState = rememberBottomSheetScaffoldState()
     var image by remember { mutableStateOf(ImageBitmap.imageResource(res, R.drawable.image_sample_landscape)) }
-    val cropifyState = rememberCropifyState(image)
+    val cropifyState = rememberCropifyState()
     var cropifyOption by remember { mutableStateOf(CropifyOption()) }
     var croppedImage by remember { mutableStateOf<ImageBitmap?>(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -86,8 +86,10 @@ class MainActivity : ComponentActivity() {
       topBar = { AppBar(scaffoldState) },
       content = {
         Cropify(
+          bitmap = image,
           state = cropifyState,
           option = cropifyOption,
+          onImageCropped = { croppedImage = it },
           modifier = Modifier
             .padding(it)
             .fillMaxSize()
@@ -108,7 +110,7 @@ class MainActivity : ComponentActivity() {
       },
       floatingActionButton = {
         FloatingActionButton(
-          onClick = { croppedImage = cropifyState.crop() },
+          onClick = { cropifyState.crop() },
           modifier = Modifier.navigationBarsPadding()
         ) {
           Image(

@@ -1,5 +1,6 @@
 package io.moyuru.cropify
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
@@ -10,17 +11,22 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import java.lang.Float.max
 import java.lang.Float.min
+import kotlin.math.roundToInt
 
 @Composable
 fun Cropify(
+  bitmap: ImageBitmap,
   state: CropifyState,
+  onImageCropped: (ImageBitmap) -> Unit,
   modifier: Modifier = Modifier,
-  option: CropifyOption = CropifyOption()
+  option: CropifyOption = CropifyOption(),
 ) {
   val density = LocalDensity.current
   val tolerance = remember { density.run { 24.dp.toPx() } }
@@ -28,7 +34,7 @@ fun Cropify(
 
   BoxWithConstraints(
     modifier = modifier
-      .pointerInput(state.bitmap, option.frameAspectRatio) {
+      .pointerInput(bitmap, option.frameAspectRatio) {
         detectDragGestures(
           onDragStart = { touchRegion = detectTouchRegion(it, state.frameRect, tolerance) },
           onDragEnd = { touchRegion = null }
@@ -43,13 +49,26 @@ fun Cropify(
         }
       }
   ) {
-    LaunchedEffect(state.bitmap, option.frameAspectRatio, constraints) {
+    LaunchedEffect(state.shouldCrop) {
+      if (!state.shouldCrop) return@LaunchedEffect
+      val scale = bitmap.width / state.imageRect.width
+      val cropped = Bitmap.createBitmap(
+        bitmap.asAndroidBitmap(),
+        ((state.frameRect.left - state.imageRect.left) * scale).roundToInt(),
+        ((state.frameRect.top - state.imageRect.top) * scale).roundToInt(),
+        (state.frameRect.width * scale).roundToInt(),
+        (state.frameRect.height * scale).roundToInt(),
+      ).asImageBitmap()
+      state.shouldCrop = false
+      onImageCropped(cropped)
+    }
+    LaunchedEffect(bitmap, option.frameAspectRatio, constraints) {
       val canvasSize = Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat())
-      state.imageRect = calculateImagePosition(state.bitmap, canvasSize)
+      state.imageRect = calculateImagePosition(bitmap, canvasSize)
       state.frameRect = calculateFrameRect(state.imageRect, canvasSize, option.frameAspectRatio)
     }
     ImageCanvas(
-      bitmap = state.bitmap,
+      bitmap = bitmap,
       offset = state.imageRect.topLeft,
       size = state.imageRect.size,
       option = option,
