@@ -50,17 +50,11 @@ fun Cropify(
       }
   ) {
     LaunchedEffect(state.shouldCrop) {
-      if (!state.shouldCrop) return@LaunchedEffect
-      val scale = bitmap.width / state.imageRect.width
-      val cropped = Bitmap.createBitmap(
-        bitmap.asAndroidBitmap(),
-        ((state.frameRect.left - state.imageRect.left) * scale).roundToInt(),
-        ((state.frameRect.top - state.imageRect.top) * scale).roundToInt(),
-        (state.frameRect.width * scale).roundToInt(),
-        (state.frameRect.height * scale).roundToInt(),
-      ).asImageBitmap()
-      state.shouldCrop = false
-      onImageCropped(cropped)
+      if (state.shouldCrop) {
+        val cropped = cropImage(bitmap, state.frameRect, state.imageRect)
+        state.shouldCrop = false
+        onImageCropped(cropped)
+      }
     }
     LaunchedEffect(bitmap, option.frameAspectRatio, constraints) {
       val canvasSize = Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat())
@@ -82,6 +76,21 @@ fun Cropify(
       modifier = Modifier.matchParentSize()
     )
   }
+}
+
+private fun cropImage(
+  bitmap: ImageBitmap,
+  frameRect: Rect,
+  imageRect: Rect,
+): ImageBitmap {
+  val scale = bitmap.width / imageRect.width
+  return Bitmap.createBitmap(
+    bitmap.asAndroidBitmap(),
+    ((frameRect.left - imageRect.left) * scale).roundToInt(),
+    ((frameRect.top - imageRect.top) * scale).roundToInt(),
+    (frameRect.width * scale).roundToInt(),
+    (frameRect.height * scale).roundToInt(),
+  ).asImageBitmap()
 }
 
 internal fun calculateImagePosition(bitmap: ImageBitmap, canvasSize: Size): Rect {
