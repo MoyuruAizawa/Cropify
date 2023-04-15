@@ -1,5 +1,6 @@
 package io.moyuru.cropify
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +16,8 @@ class CropifyState {
   internal var frameRect by mutableStateOf(Rect(0f, 0f, 0f, 0f))
   internal var imageRect by mutableStateOf(Rect(0f, 0f, 0f, 0f))
   internal var shouldCrop by mutableStateOf(false)
+  internal var loadedUri: Uri? = null
+  internal var inSampleSize = 1
 
   fun crop() {
     shouldCrop = true

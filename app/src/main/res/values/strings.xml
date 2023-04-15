@@ -17,6 +17,8 @@
   <string name="mask_alpha">Mask Alpha</string>
   <string name="background">Background</string>
   <string name="background_color">Background Color</string>
-  <string name="bitmap">Bitmap</string>
+  <string name="image">Image</string>
   <string name="flexible">Flexible</string>
+  <string name="chose_image">Chose Image</string>
+  <string name="failed_load_image">Failed to load Image.</string>
 </resources>
