@@ -1,5 +1,8 @@
 package io.moyuru.cropify
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
@@ -10,17 +13,59 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import java.lang.Float.max
 import java.lang.Float.min
+import kotlin.math.roundToInt
 
 @Composable
 fun Cropify(
+  uri: Uri,
   state: CropifyState,
+  onImageCropped: (ImageBitmap) -> Unit,
+  onFailedToLoadImage: () -> Unit,
   modifier: Modifier = Modifier,
-  option: CropifyOption = CropifyOption()
+  option: CropifyOption = CropifyOption(),
+) {
+  BoxWithConstraints(modifier = modifier) {
+    val context = LocalContext.current
+    val sampledImageBitmap = remember(uri) {
+      loadSampledImageBitmap(context, uri, constraints.run { IntSize(maxWidth, maxHeight) })
+    }
+    LaunchedEffect(sampledImageBitmap) {
+      if (sampledImageBitmap == null) {
+        onFailedToLoadImage()
+      } else {
+        state.loadedUri = uri
+        state.inSampleSize = sampledImageBitmap.inSampleSize
+      }
+    }
+
+    if (sampledImageBitmap != null) {
+      Cropify(
+        bitmap = sampledImageBitmap.imageBitmap,
+        state = state,
+        onImageCropped = onImageCropped,
+        option = option,
+        modifier = Modifier.matchParentSize()
+      )
+    }
+  }
+}
+
+@Composable
+fun Cropify(
+  bitmap: ImageBitmap,
+  state: CropifyState,
+  onImageCropped: (ImageBitmap) -> Unit,
+  modifier: Modifier = Modifier,
+  option: CropifyOption = CropifyOption(),
 ) {
   val density = LocalDensity.current
   val tolerance = remember { density.run { 24.dp.toPx() } }
@@ -28,7 +73,7 @@ fun Cropify(
 
   BoxWithConstraints(
     modifier = modifier
-      .pointerInput(state.bitmap, option.frameAspectRatio) {
+      .pointerInput(bitmap, option.frameAspectRatio) {
         detectDragGestures(
           onDragStart = { touchRegion = detectTouchRegion(it, state.frameRect, tolerance) },
           onDragEnd = { touchRegion = null }
@@ -43,13 +88,27 @@ fun Cropify(
         }
       }
   ) {
-    LaunchedEffect(state.bitmap, option.frameAspectRatio, constraints) {
+    val context = LocalContext.current
+    LaunchedEffect(state.shouldCrop) {
+      if (state.shouldCrop) {
+        val loadedUri = state.loadedUri
+        if (loadedUri != null) {
+          cropSampledImage(context, bitmap, loadedUri, state.frameRect, state.imageRect, state.inSampleSize)
+        } else {
+          cropImage(bitmap, state.frameRect, state.imageRect)
+        }
+        val cropped = cropImage(bitmap, state.frameRect, state.imageRect)
+        state.shouldCrop = false
+        onImageCropped(cropped)
+      }
+    }
+    LaunchedEffect(bitmap, option.frameAspectRatio, constraints) {
       val canvasSize = Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat())
-      state.imageRect = calculateImagePosition(state.bitmap, canvasSize)
+      state.imageRect = calculateImagePosition(bitmap, canvasSize)
       state.frameRect = calculateFrameRect(state.imageRect, canvasSize, option.frameAspectRatio)
     }
     ImageCanvas(
-      bitmap = state.bitmap,
+      bitmap = bitmap,
       offset = state.imageRect.topLeft,
       size = state.imageRect.size,
       option = option,
@@ -63,6 +122,41 @@ fun Cropify(
       modifier = Modifier.matchParentSize()
     )
   }
+}
+
+private fun cropSampledImage(
+  context: Context,
+  bitmap: ImageBitmap,
+  uri: Uri,
+  frameRect: Rect,
+  imageRect: Rect,
+  inSampleSize: Int
+): ImageBitmap {
+  return if (inSampleSize > 1) {
+    val fullImage = loadImageBitmap(context, uri)
+    if (fullImage != null) {
+      cropImage(fullImage, frameRect, imageRect)
+    } else {
+      cropImage(bitmap, frameRect, imageRect)
+    }
+  } else {
+    cropImage(bitmap, frameRect, imageRect)
+  }
+}
+
+private fun cropImage(
+  bitmap: ImageBitmap,
+  frameRect: Rect,
+  imageRect: Rect,
+): ImageBitmap {
+  val scale = bitmap.width / imageRect.width
+  return Bitmap.createBitmap(
+    bitmap.asAndroidBitmap(),
+    ((frameRect.left - imageRect.left) * scale).roundToInt(),
+    ((frameRect.top - imageRect.top) * scale).roundToInt(),
+    (frameRect.width * scale).roundToInt(),
+    (frameRect.height * scale).roundToInt(),
+  ).asImageBitmap()
 }
 
 internal fun calculateImagePosition(bitmap: ImageBitmap, canvasSize: Size): Rect {

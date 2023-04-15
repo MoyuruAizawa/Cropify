@@ -1,8 +1,13 @@
 package io.moyuru.cropifysample
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,10 +35,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,6 +57,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.MutableLiveData
 import io.moyuru.cropify.Cropify
 import io.moyuru.cropify.CropifyOption
 import io.moyuru.cropify.rememberCropifyState
@@ -60,6 +68,12 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
+  private val imageUri = MutableLiveData<Uri?>(null)
+
+  private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    if (it.resultCode == Activity.RESULT_OK) imageUri.value = it.data?.data
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -77,7 +91,8 @@ class MainActivity : ComponentActivity() {
     val res = LocalContext.current.resources
     val scaffoldState = rememberBottomSheetScaffoldState()
     var image by remember { mutableStateOf(ImageBitmap.imageResource(res, R.drawable.image_sample_landscape)) }
-    val cropifyState = rememberCropifyState(image)
+    val imageUri = imageUri.observeAsState().value
+    val cropifyState = rememberCropifyState()
     var cropifyOption by remember { mutableStateOf(CropifyOption()) }
     var croppedImage by remember { mutableStateOf<ImageBitmap?>(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -85,13 +100,28 @@ class MainActivity : ComponentActivity() {
     BottomSheetScaffold(
       topBar = { AppBar(scaffoldState) },
       content = {
-        Cropify(
-          state = cropifyState,
-          option = cropifyOption,
-          modifier = Modifier
-            .padding(it)
-            .fillMaxSize()
-        )
+        if (imageUri != null) {
+          Cropify(
+            uri = imageUri,
+            state = cropifyState,
+            option = cropifyOption,
+            onImageCropped = { croppedImage = it },
+            onFailedToLoadImage = { Toast.makeText(this, R.string.failed_load_image, Toast.LENGTH_SHORT).show() },
+            modifier = Modifier
+              .padding(it)
+              .fillMaxSize()
+          )
+        } else {
+          Cropify(
+            bitmap = image,
+            state = cropifyState,
+            option = cropifyOption,
+            onImageCropped = { croppedImage = it },
+            modifier = Modifier
+              .padding(it)
+              .fillMaxSize()
+          )
+        }
       },
       sheetContent = {
         CropifyOptionSelector(
@@ -99,6 +129,7 @@ class MainActivity : ComponentActivity() {
           onOptionChanged = { cropifyOption = it },
           onImageSelected = {
             image = it
+            this@MainActivity.imageUri.value = null
             coroutineScope.launch { scaffoldState.bottomSheetState.collapse() }
           },
           modifier = Modifier
@@ -108,7 +139,7 @@ class MainActivity : ComponentActivity() {
       },
       floatingActionButton = {
         FloatingActionButton(
-          onClick = { croppedImage = cropifyState.crop() },
+          onClick = { cropifyState.crop() },
           modifier = Modifier.navigationBarsPadding()
         ) {
           Image(
@@ -220,7 +251,7 @@ class MainActivity : ComponentActivity() {
 
       Space(16.dp)
 
-      HeadlineS(text = stringResource(id = R.string.bitmap))
+      HeadlineS(text = stringResource(id = R.string.image))
       Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -251,6 +282,22 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier.matchParentSize()
           )
         }
+      }
+      TextButton(
+        onClick = {
+          val intent = Intent.createChooser(
+            Intent(Intent.ACTION_OPEN_DOCUMENT)
+              .apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "images/*"
+                putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*"))
+              },
+            null
+          )
+          launcher.launch(intent)
+        }
+      ) {
+        Text(text = stringResource(id = R.string.chose_image))
       }
     }
   }

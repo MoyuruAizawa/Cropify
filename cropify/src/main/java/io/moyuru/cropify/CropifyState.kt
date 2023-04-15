@@ -1,6 +1,6 @@
 package io.moyuru.cropify
 
-import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,28 +8,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import kotlin.math.roundToInt
 
 @Composable
-fun rememberCropifyState(bitmap: ImageBitmap) = remember(bitmap) { CropifyState(bitmap) }
+fun rememberCropifyState() = remember(Unit) { CropifyState() }
 
-class CropifyState(bitmap: ImageBitmap) {
-  internal var bitmap by mutableStateOf(bitmap)
+class CropifyState {
   internal var frameRect by mutableStateOf(Rect(0f, 0f, 0f, 0f))
   internal var imageRect by mutableStateOf(Rect(0f, 0f, 0f, 0f))
+  internal var shouldCrop by mutableStateOf(false)
+  internal var loadedUri: Uri? = null
+  internal var inSampleSize = 1
 
-  fun crop(): ImageBitmap {
-    val scale = bitmap.width / imageRect.width
-    return Bitmap.createBitmap(
-      bitmap.asAndroidBitmap(),
-      ((frameRect.left - imageRect.left) * scale).roundToInt(),
-      ((frameRect.top - imageRect.top) * scale).roundToInt(),
-      (frameRect.width * scale).roundToInt(),
-      (frameRect.height * scale).roundToInt(),
-    ).asImageBitmap()
+  fun crop() {
+    shouldCrop = true
   }
 
   internal fun translateFrameRect(offset: Offset) {
