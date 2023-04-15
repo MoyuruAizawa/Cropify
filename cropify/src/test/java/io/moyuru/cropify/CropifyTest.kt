@@ -38,24 +38,32 @@ internal class CropifyTest {
   fun calculateImageSize() {
     val bitmap = mockk<ImageBitmap>()
 
-    every { bitmap.width } returns 1920
-    every { bitmap.height } returns 1080
+    every { bitmap.width } returns 3024
+    every { bitmap.height } returns 4032
     assertEquals(
-      Size(1920f, 1080f),
-      calculateImageSize(
-        bitmap = bitmap,
-        canvasSize = Size(1920f, 1080f)
-      )
+      Size(1080f, 1440f),
+      calculateImageSize(bitmap = bitmap, canvasSize = Size(1080f, 1920f))
     )
 
-    every { bitmap.width } returns 1080
-    every { bitmap.height } returns 1920
+    every { bitmap.width } returns 4032
+    every { bitmap.height } returns 3024
     assertEquals(
-      Size(607.5f, 1080f),
-      calculateImageSize(
-        bitmap = bitmap,
-        canvasSize = Size(1920f, 1080f)
-      ),
+      Size(1080f, 810f),
+      calculateImageSize(bitmap = bitmap, canvasSize = Size(1080f, 1920f)),
+    )
+
+    every { bitmap.width } returns 3024
+    every { bitmap.height } returns 4032
+    assertEquals(
+      Size(810f, 1080f),
+      calculateImageSize(bitmap = bitmap, canvasSize = Size(1920f, 1080f))
+    )
+
+    every { bitmap.width } returns 4032
+    every { bitmap.height } returns 3024
+    assertEquals(
+      Size(1440f, 1080f),
+      calculateImageSize(bitmap = bitmap, canvasSize = Size(1920f, 1080f)),
     )
   }
 
