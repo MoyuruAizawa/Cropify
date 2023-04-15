@@ -27,6 +27,36 @@ dependencies {
 }
 ```
 
+# Usage
+
+Bitmap
+
+```kotlin
+val state = rememberCropifyState()
+
+Cropify(
+  bitmap = imageResource(R.drawable.bitmap),
+  state = state,
+  onImageCropped = {},
+)
+```
+
+Uri
+
+```kotlin
+val state = rememberCropifyState()
+
+Cropify(
+  uri = imageUri,
+  state = state,
+  onImageCropped = {},
+  onFailedToLoadImage = {}
+)
+```
+
+Invoke `CropifyState#crop`, the cropped image will be passed to `onImageCropped`.
+If loading an image from Uri fails, `onFailedToLoadImage` will be called.
+
 # Features
 
 - Cropping.
