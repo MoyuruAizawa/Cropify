@@ -7,25 +7,31 @@ import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.IntSize
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-internal fun loadImageBitmap(context: Context, uri: Uri): ImageBitmap? {
-  val resolver = context.contentResolver
-  return BitmapFactory.decodeStream(resolver.openInputStream(uri), Rect(), BitmapFactory.Options())?.asImageBitmap()
+internal suspend fun loadImageBitmap(context: Context, uri: Uri): ImageBitmap? {
+  return withContext(Dispatchers.IO) {
+    val resolver = context.contentResolver
+    BitmapFactory.decodeStream(resolver.openInputStream(uri), Rect(), BitmapFactory.Options())?.asImageBitmap()
+  }
 }
 
-internal fun loadSampledImageBitmap(context: Context, uri: Uri, requireSize: IntSize): SampledImageBitmap? {
-  val resolver = context.contentResolver
-  val options = BitmapFactory.Options().apply {
-    inJustDecodeBounds = true
-    BitmapFactory.decodeStream(resolver.openInputStream(uri), Rect(), this)
-  }
-  val inSampleSize = calculateInSampleSize(IntSize(options.outWidth, options.outHeight), requireSize)
-  options.apply {
-    inJustDecodeBounds = false
-    this.inSampleSize = inSampleSize
-  }
-  return BitmapFactory.decodeStream(resolver.openInputStream(uri), Rect(), options)?.let {
-    SampledImageBitmap(it.asImageBitmap(), inSampleSize)
+internal suspend fun loadSampledImageBitmap(context: Context, uri: Uri, requireSize: IntSize): SampledImageBitmap? {
+  return withContext(Dispatchers.IO) {
+    val resolver = context.contentResolver
+    val options = BitmapFactory.Options().apply {
+      inJustDecodeBounds = true
+      BitmapFactory.decodeStream(resolver.openInputStream(uri), Rect(), this)
+    }
+    val inSampleSize = calculateInSampleSize(IntSize(options.outWidth, options.outHeight), requireSize)
+    options.apply {
+      inJustDecodeBounds = false
+      this.inSampleSize = inSampleSize
+    }
+    BitmapFactory.decodeStream(resolver.openInputStream(uri), Rect(), options)?.let {
+      SampledImageBitmap(it.asImageBitmap(), inSampleSize)
+    }
   }
 }
 
