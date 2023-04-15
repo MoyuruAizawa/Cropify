@@ -168,10 +168,10 @@ internal fun calculateImagePosition(bitmap: ImageBitmap, canvasSize: Size): Rect
 }
 
 internal fun calculateImageSize(bitmap: ImageBitmap, canvasSize: Size): Size {
-  return if (bitmap.width > bitmap.height)
-    Size(canvasSize.width, canvasSize.width * bitmap.height / bitmap.width.toFloat())
-  else
-    Size(canvasSize.height * bitmap.width / bitmap.height.toFloat(), canvasSize.height)
+  val newSize = Size(canvasSize.width, canvasSize.width * bitmap.height / bitmap.width.toFloat())
+  return if (newSize.height > canvasSize.height)
+    (canvasSize.height / newSize.height).let { Size(newSize.width * it, newSize.height * it) }
+  else newSize
 }
 
 internal fun calculateFrameRect(
