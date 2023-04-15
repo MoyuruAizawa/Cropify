@@ -1,12 +1,15 @@
 # Cropify
+
 ![JitPack](https://jitpack.io/v/MoyuruAizawa/cropify.svg)
 ![Vital](https://github.com/MoyuruAizawa/Cropify/actions/workflows/vital_check.yml/badge.svg)  
-Lightweight image cropper for Android Jetpack Compose.  
+Lightweight image cropper for Android Jetpack Compose.
 
 https://user-images.githubusercontent.com/9051623/231838736-8bff221e-8515-4dd4-8314-64c3166e700d.mov
 
 # Installation
-1. Add the JitPack repository to your root `build.gradle`. 
+
+1. Add the JitPack repository to your root `build.gradle`.
+
 ```
 allprojects {
   repositories {
@@ -17,13 +20,22 @@ allprojects {
 ```
 
 2. Add the dependency.
+
 ```
 dependencies {
   implementation 'com.github.moyuruaizawa:cropify:${cropifyVersion}'
 }
 ```
 
+# Features
+
+- Cropping.
+- set Bitmap or load android.net.Uri.
+- Bitmap memory optimization.
+- API Level 21+.
+
 # Customizations
+
 - Cropping frame color.
 - Cropping frame alpha.
 - Cropping frame stroke width.
@@ -34,3 +46,8 @@ dependencies {
 - Mask (outside of cropping frame) color.
 - Mask alpha.
 - Background color.
+
+# Acknowledgement
+
+I would like to thank [ArthurHub/Android-Image-Cropper](https://github.com/ArthurHub/Android-Image-Cropper).    
+Cropify aims to a Jetpack Compose implementation of ArthurHub/Android-Image-Cropper.  
