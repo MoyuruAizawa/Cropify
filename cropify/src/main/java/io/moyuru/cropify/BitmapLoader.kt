@@ -29,7 +29,7 @@ internal fun loadSampledImageBitmap(context: Context, uri: Uri, requireSize: Int
   }
 }
 
-private fun calculateInSampleSize(imageSize: IntSize, requireSize: IntSize): Int {
+internal fun calculateInSampleSize(imageSize: IntSize, requireSize: IntSize): Int {
   var inSampleSize = 1
   if (imageSize.height > requireSize.height || imageSize.width > requireSize.width) {
     val halfHeight: Int = imageSize.height / 2
