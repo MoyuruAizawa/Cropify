@@ -21,4 +21,7 @@
   <string name="flexible">Flexible</string>
   <string name="chose_image">Chose Image</string>
   <string name="failed_load_image">Failed to load Image.</string>
+  <string name="crop_bitmap">Crop Bitmap</string>
+  <string name="crop_file">Crop File</string>
+  <string name="navigation_button_alt">Navigation button</string>
 </resources>
