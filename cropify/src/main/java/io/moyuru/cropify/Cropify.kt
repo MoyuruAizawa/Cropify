@@ -7,7 +7,10 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -23,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import java.lang.Float.max
 import java.lang.Float.min
 import kotlin.math.roundToInt
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun Cropify(
@@ -35,21 +40,20 @@ fun Cropify(
 ) {
   BoxWithConstraints(modifier = modifier) {
     val context = LocalContext.current
-    val sampledImageBitmap = remember(uri) {
-      loadSampledImageBitmap(context, uri, constraints.run { IntSize(maxWidth, maxHeight) })
-    }
-    LaunchedEffect(sampledImageBitmap) {
+    var sampledImageBitmap by remember(uri) { mutableStateOf<SampledImageBitmap?>(null) }
+    LaunchedEffect(uri) {
+      sampledImageBitmap = loadSampledImageBitmap(context, uri, constraints.run { IntSize(maxWidth, maxHeight) })
       if (sampledImageBitmap == null) {
         onFailedToLoadImage()
       } else {
         state.loadedUri = uri
-        state.inSampleSize = sampledImageBitmap.inSampleSize
+        state.inSampleSize = requireNotNull(sampledImageBitmap).inSampleSize
       }
     }
 
     if (sampledImageBitmap != null) {
       Cropify(
-        bitmap = sampledImageBitmap.imageBitmap,
+        bitmap = requireNotNull(sampledImageBitmap).imageBitmap,
         state = state,
         onImageCropped = onImageCropped,
         option = option,
@@ -124,7 +128,7 @@ fun Cropify(
   }
 }
 
-private fun cropSampledImage(
+private suspend fun cropSampledImage(
   context: Context,
   bitmap: ImageBitmap,
   uri: Uri,
@@ -132,31 +136,32 @@ private fun cropSampledImage(
   imageRect: Rect,
   inSampleSize: Int
 ): ImageBitmap {
-  return if (inSampleSize > 1) {
-    val fullImage = loadImageBitmap(context, uri)
-    if (fullImage != null) {
-      cropImage(fullImage, frameRect, imageRect)
+  return withContext(Dispatchers.IO) {
+    if (inSampleSize > 1) {
+      val fullImage = loadImageBitmap(context, uri)
+      if (fullImage != null) cropImage(fullImage, frameRect, imageRect)
+      else cropImage(bitmap, frameRect, imageRect)
     } else {
       cropImage(bitmap, frameRect, imageRect)
     }
-  } else {
-    cropImage(bitmap, frameRect, imageRect)
   }
 }
 
-private fun cropImage(
+private suspend fun cropImage(
   bitmap: ImageBitmap,
   frameRect: Rect,
   imageRect: Rect,
 ): ImageBitmap {
-  val scale = bitmap.width / imageRect.width
-  return Bitmap.createBitmap(
-    bitmap.asAndroidBitmap(),
-    ((frameRect.left - imageRect.left) * scale).roundToInt(),
-    ((frameRect.top - imageRect.top) * scale).roundToInt(),
-    (frameRect.width * scale).roundToInt(),
-    (frameRect.height * scale).roundToInt(),
-  ).asImageBitmap()
+  return withContext(Dispatchers.IO) {
+    val scale = bitmap.width / imageRect.width
+    Bitmap.createBitmap(
+      bitmap.asAndroidBitmap(),
+      ((frameRect.left - imageRect.left) * scale).roundToInt(),
+      ((frameRect.top - imageRect.top) * scale).roundToInt(),
+      (frameRect.width * scale).roundToInt(),
+      (frameRect.height * scale).roundToInt(),
+    ).asImageBitmap()
+  }
 }
 
 internal fun calculateImagePosition(bitmap: ImageBitmap, canvasSize: Size): Rect {
