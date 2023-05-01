@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.IntSize
+import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -17,7 +18,7 @@ internal suspend fun loadImageBitmap(context: Context, uri: Uri): ImageBitmap? {
   }
 }
 
-internal suspend fun loadSampledImageBitmap(context: Context, uri: Uri, requireSize: IntSize): SampledImageBitmap? {
+internal suspend fun loadSampledImageBitmap(context: Context, uri: Uri, requireSize: IntSize): SampledImageBitmap {
   return withContext(Dispatchers.IO) {
     val resolver = context.contentResolver
     val options = BitmapFactory.Options().apply {
@@ -29,9 +30,9 @@ internal suspend fun loadSampledImageBitmap(context: Context, uri: Uri, requireS
       inJustDecodeBounds = false
       this.inSampleSize = inSampleSize
     }
-    BitmapFactory.decodeStream(resolver.openInputStream(uri), Rect(), options)?.let {
-      SampledImageBitmap(it.asImageBitmap(), inSampleSize)
-    }
+    BitmapFactory.decodeStream(resolver.openInputStream(uri), Rect(), options)
+      ?.let { SampledImageBitmap(it.asImageBitmap(), inSampleSize) }
+      ?: throw IOException("Failed to decode stream.")
   }
 }
 
