@@ -34,20 +34,22 @@ fun Cropify(
   uri: Uri,
   state: CropifyState,
   onImageCropped: (ImageBitmap) -> Unit,
-  onFailedToLoadImage: () -> Unit,
+  onFailedToLoadImage: (Throwable) -> Unit,
   modifier: Modifier = Modifier,
   option: CropifyOption = CropifyOption(),
 ) {
   BoxWithConstraints(modifier = modifier) {
     val context = LocalContext.current
     var sampledImageBitmap by remember(uri) { mutableStateOf<SampledImageBitmap?>(null) }
+
     LaunchedEffect(uri) {
-      sampledImageBitmap = loadSampledImageBitmap(context, uri, constraints.run { IntSize(maxWidth, maxHeight) })
-      if (sampledImageBitmap == null) {
-        onFailedToLoadImage()
-      } else {
+      try {
+        sampledImageBitmap = loadSampledImageBitmap(context, uri, constraints.run { IntSize(maxWidth, maxHeight) })
         state.loadedUri = uri
         state.inSampleSize = requireNotNull(sampledImageBitmap).inSampleSize
+      } catch (t: Throwable) {
+        sampledImageBitmap = null
+        onFailedToLoadImage(t)
       }
     }
 
