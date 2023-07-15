@@ -98,12 +98,11 @@ fun Cropify(
     LaunchedEffect(state.shouldCrop) {
       if (state.shouldCrop) {
         val loadedUri = state.loadedUri
-        if (loadedUri != null) {
+        val cropped = if (loadedUri != null) {
           cropSampledImage(context, bitmap, loadedUri, state.frameRect, state.imageRect, state.inSampleSize)
         } else {
           cropImage(bitmap, state.frameRect, state.imageRect)
         }
-        val cropped = cropImage(bitmap, state.frameRect, state.imageRect)
         state.shouldCrop = false
         onImageCropped(cropped)
       }
