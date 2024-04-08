@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import java.lang.Float.max
 import java.lang.Float.min
-import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -157,10 +156,10 @@ private suspend fun cropImage(
     val scale = bitmap.width / imageRect.width
     Bitmap.createBitmap(
       bitmap.asAndroidBitmap(),
-      ((frameRect.left - imageRect.left) * scale).roundToInt(),
-      ((frameRect.top - imageRect.top) * scale).roundToInt(),
-      (frameRect.width * scale).roundToInt(),
-      (frameRect.height * scale).roundToInt(),
+      ((frameRect.left - imageRect.left) * scale).toInt(),
+      ((frameRect.top - imageRect.top) * scale).toInt(),
+      (frameRect.width * scale).toInt().coerceIn(1..bitmap.width),
+      (frameRect.height * scale).toInt().coerceIn(1..bitmap.height),
     ).asImageBitmap()
   }
 }
