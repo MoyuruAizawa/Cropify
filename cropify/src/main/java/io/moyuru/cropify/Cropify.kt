@@ -200,7 +200,7 @@ internal fun detectTouchRegion(tapPosition: Offset, frameRect: Rect, tolerance: 
     Rect(frameRect.topRight, tolerance).contains(tapPosition) -> TouchRegion.Vertex.TOP_RIGHT
     Rect(frameRect.bottomLeft, tolerance).contains(tapPosition) -> TouchRegion.Vertex.BOTTOM_LEFT
     Rect(frameRect.bottomRight, tolerance).contains(tapPosition) -> TouchRegion.Vertex.BOTTOM_RIGHT
-    Rect(frameRect.center, frameRect.width / 2 - tolerance).contains(tapPosition) -> TouchRegion.Inside
+    frameRect.contains(tapPosition) -> TouchRegion.Inside
     else -> null
   }
 }
