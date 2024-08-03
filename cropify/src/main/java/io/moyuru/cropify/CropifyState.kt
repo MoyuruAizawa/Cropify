@@ -34,11 +34,11 @@ class CropifyState {
 
   internal fun scaleFrameRect(
     point: TouchRegion.Vertex,
-    aspectRatio: AspectRatio?,
+    fixedAspectRatio: CropifySize.FixedAspectRatio?,
     amount: Offset,
     minimumVertexDistance: Float
   ) {
-    frameRect = if (aspectRatio == null) scaleFlexibleRect(point, amount, minimumVertexDistance)
+    frameRect = if (fixedAspectRatio == null) scaleFlexibleRect(point, amount, minimumVertexDistance)
     else scaleFixedAspectRatioRect(point, amount, minimumVertexDistance)
   }
 

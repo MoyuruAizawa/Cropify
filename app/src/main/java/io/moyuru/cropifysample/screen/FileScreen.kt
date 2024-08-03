@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.moyuru.cropify.Cropify
 import io.moyuru.cropify.CropifyOption
+import io.moyuru.cropify.CropifySize
 import io.moyuru.cropify.rememberCropifyState
 import io.moyuru.cropifysample.R
 import io.moyuru.cropifysample.widget.AppBar
@@ -37,7 +38,7 @@ import io.moyuru.cropifysample.widget.ImagePreviewDialog
 fun FileScreen(imageUri: Uri) {
   val scaffoldState = rememberBottomSheetScaffoldState()
   val cropifyState = rememberCropifyState()
-  var cropifyOption by remember { mutableStateOf(CropifyOption()) }
+  var cropifyOption by remember { mutableStateOf(CropifyOption(frameSize = CropifySize.PercentageSize(.9f))) }
   var croppedImage by remember { mutableStateOf<ImageBitmap?>(null) }
 
   croppedImage?.let { ImagePreviewDialog(bitmap = it) { croppedImage = null } }

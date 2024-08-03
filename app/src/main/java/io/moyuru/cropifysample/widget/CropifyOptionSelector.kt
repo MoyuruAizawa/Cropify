@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.moyuru.cropify.CropifySize
 import io.moyuru.cropify.CropifyOption
 import io.moyuru.cropifysample.R
 
@@ -32,8 +33,10 @@ fun CropifyOptionSelector(
       valueRange = 1f..12f
     )
     TitleM(text = stringResource(id = R.string.frame_aspect_ratio))
-    AspectRatioPicker(selectedAspectRatio = option.frameAspectRatio) {
-      onOptionChanged(option.copy(frameAspectRatio = it))
+
+    val frameFixedAspectRatio = option.frameSize as? CropifySize.FixedAspectRatio
+    AspectRatioPicker(selectedFixedAspectRatio = frameFixedAspectRatio) {
+      onOptionChanged(option.copy(frameSize = it))
     }
 
     Space(dp = 16.dp)
