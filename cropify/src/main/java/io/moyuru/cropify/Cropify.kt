@@ -75,17 +75,18 @@ fun Cropify(
   val density = LocalDensity.current
   val tolerance = remember { density.run { 24.dp.toPx() } }
   var touchRegion = remember<TouchRegion?> { null }
+  val frameFixedAspectRatio = option.frameSize as? CropifySize.FixedAspectRatio
 
   BoxWithConstraints(
     modifier = modifier
-      .pointerInput(bitmap, option.frameAspectRatio) {
+      .pointerInput(bitmap, frameFixedAspectRatio) {
         detectDragGestures(
           onDragStart = { touchRegion = detectTouchRegion(it, state.frameRect, tolerance) },
           onDragEnd = { touchRegion = null }
         ) { change, dragAmount ->
           touchRegion?.let {
             when (it) {
-              is TouchRegion.Vertex -> state.scaleFrameRect(it, option.frameAspectRatio, dragAmount, tolerance * 2)
+              is TouchRegion.Vertex -> state.scaleFrameRect(it, frameFixedAspectRatio, dragAmount, tolerance * 2)
               TouchRegion.Inside -> state.translateFrameRect(dragAmount)
             }
             change.consume()
@@ -106,10 +107,10 @@ fun Cropify(
         onImageCropped(cropped)
       }
     }
-    LaunchedEffect(bitmap, option.frameAspectRatio, constraints) {
+    LaunchedEffect(bitmap, frameFixedAspectRatio, constraints) {
       val canvasSize = Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat())
       state.imageRect = calculateImagePosition(bitmap, canvasSize)
-      state.frameRect = calculateFrameRect(state.imageRect, canvasSize, option.frameAspectRatio)
+      state.frameRect = calculateFrameRect(state.imageRect, canvasSize, option.frameSize)
     }
     ImageCanvas(
       bitmap = bitmap,
@@ -182,14 +183,23 @@ internal fun calculateImageSize(bitmap: ImageBitmap, canvasSize: Size): Size {
 internal fun calculateFrameRect(
   imageRect: Rect,
   canvasSize: Size,
-  frameAspectRatio: AspectRatio?,
+  cropifySize: CropifySize?,
 ): Rect {
   val shortSide = min(imageRect.width, imageRect.height)
-  return if (frameAspectRatio == null) {
+  return if (cropifySize == null) {
     Rect(center = imageRect.center, radius = shortSide * 0.8f / 2)
   } else {
-    val scale = shortSide / max(imageRect.width, imageRect.width * frameAspectRatio.value)
-    val size = Size(imageRect.width * scale * 0.8f, imageRect.width * scale * frameAspectRatio.value * 0.8f)
+    val size = when (cropifySize) {
+      is CropifySize.FixedAspectRatio -> {
+        val scale = shortSide / max(imageRect.width, imageRect.width * cropifySize.value)
+        Size(imageRect.width * scale * 0.8f, imageRect.width * scale * cropifySize.value * 0.8f)
+      }
+
+      is CropifySize.PercentageSize -> {
+        Size(imageRect.width * cropifySize.widthPercentage, imageRect.height * cropifySize.heightPercentage)
+      }
+    }
+
     Rect(Offset((canvasSize.width - size.width) / 2, (canvasSize.height - size.height) / 2), size)
   }
 }

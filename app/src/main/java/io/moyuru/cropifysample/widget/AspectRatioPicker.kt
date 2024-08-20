@@ -18,14 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import io.moyuru.cropify.AspectRatio
+import io.moyuru.cropify.CropifySize
 import io.moyuru.cropifysample.R
 
 @Composable
 fun AspectRatioPicker(
-  selectedAspectRatio: AspectRatio?,
+  selectedFixedAspectRatio: CropifySize.FixedAspectRatio?,
   modifier: Modifier = Modifier,
-  onPicked: (AspectRatio?) -> Unit
+  onPicked: (CropifySize.FixedAspectRatio?) -> Unit
 ) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
@@ -39,16 +39,16 @@ fun AspectRatioPicker(
       3 to 4,
     )
     aspectRatioList.forEach { (x, y) ->
-      val aspectRatio = AspectRatio(x, y)
+      val fixedAspectRatio = CropifySize.FixedAspectRatio(x, y)
       Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier
-          .clickable { onPicked(aspectRatio) }
+          .clickable { onPicked(fixedAspectRatio) }
           .padding(8.dp)
       ) {
         Crossfade(
-          targetState = if (selectedAspectRatio == aspectRatio)
+          targetState = if (selectedFixedAspectRatio == fixedAspectRatio)
             MaterialTheme.colorScheme.primary
           else
             MaterialTheme.colorScheme.onSurface
