@@ -8,14 +8,15 @@ https://user-images.githubusercontent.com/9051623/231838736-8bff221e-8515-4dd4-8
 
 # Installation
 
-1. Add the JitPack repository to your root `build.gradle`.
+1. Add the JitPack repository to `settings.gradle.kts`.
 
 ```
-allprojects {
-  repositories {
+dependencyResolutionManagement {
     ...
-    maven { url 'https://jitpack.io' }
-  }
+    repositories {        
+        ...
+        maven("https://jitpack.io")
+    }
 }
 ```
 
@@ -23,7 +24,7 @@ allprojects {
 
 ```
 dependencies {
-  implementation 'com.github.moyuruaizawa:cropify:${cropifyVersion}'
+  implementation("com.github.moyuruaizawa:cropify:${cropifyVersion}")
 }
 ```
 
@@ -38,6 +39,9 @@ Cropify(
   bitmap = imageResource(R.drawable.bitmap),
   state = state,
   onImageCropped = {},
+  option = CropifyOption(
+    frameSize = FullSize
+  ),
 )
 ```
 
@@ -50,7 +54,10 @@ Cropify(
   uri = imageUri,
   state = state,
   onImageCropped = {},
-  onFailedToLoadImage = {}
+  onFailedToLoadImage = {},
+  option = CropifyOption(
+    frameSize = FullSize
+  ),
 )
 ```
 
