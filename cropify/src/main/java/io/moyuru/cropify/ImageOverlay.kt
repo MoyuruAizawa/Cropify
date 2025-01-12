@@ -73,12 +73,14 @@ private fun DrawScope.drawCorner(
         start = start.translateX(-width / 2),
         end = start.translateX(cornerLength),
         color = option.frameColor,
+        alpha = option.frameAlpha,
         strokeWidth = width
       )
       drawLine(
         start = start,
         end = start.translateY(cornerLength),
         color = option.frameColor,
+        alpha = option.frameAlpha,
         strokeWidth = width
       )
     }
@@ -89,12 +91,14 @@ private fun DrawScope.drawCorner(
         start = start.translateX(width / 2),
         end = start.translateX(-cornerLength),
         color = option.frameColor,
+        alpha = option.frameAlpha,
         strokeWidth = width
       )
       drawLine(
         start = start,
         end = start.translateY(cornerLength),
         color = option.frameColor,
+        alpha = option.frameAlpha,
         strokeWidth = width
       )
     }
@@ -105,12 +109,14 @@ private fun DrawScope.drawCorner(
         start = start.translateX(-width / 2),
         end = start.translateX(cornerLength),
         color = option.frameColor,
+        alpha = option.frameAlpha,
         strokeWidth = width
       )
       drawLine(
         start = start,
         end = start.translateY(-cornerLength),
         color = option.frameColor,
+        alpha = option.frameAlpha,
         strokeWidth = width
       )
     }
@@ -121,12 +127,14 @@ private fun DrawScope.drawCorner(
         start = start.translateX(width / 2),
         end = start.translateX(-cornerLength),
         color = option.frameColor,
+        alpha = option.frameAlpha,
         strokeWidth = width
       )
       drawLine(
         start = start,
         end = start.translateY(-cornerLength),
         color = option.frameColor,
+        alpha = option.frameAlpha,
         strokeWidth = width
       )
     }
