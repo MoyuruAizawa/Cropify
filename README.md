@@ -6,6 +6,8 @@ Lightweight image cropper for Android Jetpack Compose.
 
 https://user-images.githubusercontent.com/9051623/231838736-8bff221e-8515-4dd4-8314-64c3166e700d.mov
 
+The AI-generated Wiki is [here](https://deepwiki.com/MoyuruAizawa/Cropify).
+
 # Installation
 
 1. Add the JitPack repository to `settings.gradle.kts`.
