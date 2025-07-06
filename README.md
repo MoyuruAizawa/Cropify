@@ -1,12 +1,11 @@
 # Cropify
 
 [![JitPack](https://jitpack.io/v/MoyuruAizawa/cropify.svg)](https://jitpack.io/#MoyuruAizawa/cropify)
-[![Vital](https://github.com/MoyuruAizawa/Cropify/actions/workflows/vital_check.yml/badge.svg)](https://github.com/MoyuruAizawa/Cropify/actions/workflows/vital_check.yml)  
+[![Vital](https://github.com/MoyuruAizawa/Cropify/actions/workflows/vital_check.yml/badge.svg)](https://github.com/MoyuruAizawa/Cropify/actions/workflows/vital_check.yml)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/MoyuruAizawa/Cropify)  
 Lightweight image cropper for Android Jetpack Compose.
 
 https://user-images.githubusercontent.com/9051623/231838736-8bff221e-8515-4dd4-8314-64c3166e700d.mov
-
-The AI-generated Wiki is [here](https://deepwiki.com/MoyuruAizawa/Cropify).
 
 # Installation
 
