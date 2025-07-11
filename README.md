@@ -5,7 +5,7 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/MoyuruAizawa/Cropify)  
 Lightweight image cropper for Android Jetpack Compose.
 
-https://user-images.githubusercontent.com/9051623/231838736-8bff221e-8515-4dd4-8314-64c3166e700d.mov
+<img src="https://github.com/MoyuruAizawa/Images/raw/master/Cropify/sample_01.gif?raw=true" height="640" width="305" />
 
 # Installation
 
