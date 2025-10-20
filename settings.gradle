@@ -13,5 +13,5 @@ dependencyResolutionManagement {
   }
 }
 rootProject.name = "Cropify"
-include ':app'
-include ':cropify'
+include(":app")
+include(":cropify")
