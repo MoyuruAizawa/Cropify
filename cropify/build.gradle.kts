@@ -1,15 +1,16 @@
 plugins {
-  id("com.android.library")
-  id("org.jetbrains.kotlin.android")
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.compose)
 }
 
 android {
   namespace = "io.moyuru.cropify"
-  compileSdk = 33
+  compileSdk = 36
 
   defaultConfig {
     minSdk = 21
-    targetSdk = 33
+    targetSdk = 36
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles("consumer-rules.pro")
   }
@@ -30,26 +31,21 @@ android {
   kotlinOptions {
     jvmTarget = "1.8"
   }
-  buildFeatures {
-    compose = true
-  }
-  composeOptions {
-    kotlinCompilerExtensionVersion = "1.4.4"
-  }
 }
 
 dependencies {
-  implementation("androidx.core:core-ktx:1.12.0")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-  implementation("androidx.activity:activity-compose:1.8.2")
-  implementation(platform("androidx.compose:compose-bom:${rootProject.extra["compose_version"]}"))
-  implementation("androidx.compose.ui:ui")
-  implementation("androidx.compose.ui:ui-tooling-preview")
-  implementation("androidx.compose.foundation:foundation")
-  implementation("androidx.exifinterface:exifinterface:1.3.7")
-  debugImplementation("androidx.compose.ui:ui-tooling")
-  testImplementation("junit:junit:4.13.2")
-  testImplementation("io.mockk:mockk:1.13.10")
-  androidTestImplementation("androidx.test.ext:junit:1.1.5")
-  androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+  implementation(platform(libs.androidx.compose.bom))
+  implementation(libs.androidx.compose.foundation)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.ui.graphics)
+  debugImplementation(libs.androidx.compose.ui.tooling)
+  implementation(libs.androidx.compose.ui.tooling.preview)
+
+  implementation(libs.androidx.exifinterface)
+
+  testImplementation(libs.androidx.junit)
+  testImplementation(libs.junit)
+  testImplementation(libs.mockk)
+  androidTestImplementation(libs.androidx.junit)
+  androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }

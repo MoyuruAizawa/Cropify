@@ -1,16 +1,17 @@
 plugins {
-  id("com.android.application")
-  id("org.jetbrains.kotlin.android")
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.compose)
 }
 
 android {
   namespace = "io.moyuru.cropifysample"
-  compileSdk = 34
+  compileSdk = 36
 
   defaultConfig {
     applicationId = "io.moyuru.cropifysample"
     minSdk = 21
-    targetSdk = 34
+    targetSdk = 36
     versionCode = 1
     versionName = "1.0"
 
@@ -36,12 +37,6 @@ android {
   kotlinOptions {
     jvmTarget = "1.8"
   }
-  buildFeatures {
-    compose = true
-  }
-  composeOptions {
-    kotlinCompilerExtensionVersion = "1.4.4"
-  }
   packagingOptions {
     resources {
       excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -51,18 +46,18 @@ android {
 
 dependencies {
   implementation(project(":cropify"))
-  implementation("androidx.core:core-ktx:1.12.0")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-  implementation("androidx.activity:activity-compose:1.8.2")
-  implementation("androidx.navigation:navigation-compose:2.7.7")
-  implementation(platform("androidx.compose:compose-bom:${rootProject.extra["compose_version"]}"))
-  implementation("androidx.compose.ui:ui")
-  implementation("androidx.compose.ui:ui-tooling-preview")
-  implementation("androidx.compose.foundation:foundation")
-  implementation("androidx.compose.runtime:runtime")
-  implementation("androidx.compose.runtime:runtime-livedata")
-  implementation("androidx.compose.material:material:1.6.5")
-  implementation("androidx.compose.material3:material3:1.2.1")
-  debugImplementation("androidx.compose.ui:ui-tooling")
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+  implementation(platform(libs.androidx.compose.bom))
+
+  implementation(libs.androidx.activity.compose)
+  implementation(libs.androidx.compose.material)
+  implementation(libs.androidx.compose.material3)
+  implementation(libs.androidx.navigation.compose)
+
+  implementation(libs.androidx.compose.foundation)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.ui.graphics)
+  debugImplementation(libs.androidx.compose.ui.tooling)
+  implementation(libs.androidx.compose.ui.tooling.preview)
+  implementation(libs.androidx.core.ktx)
+  implementation(libs.androidx.lifecycle.runtime.ktx)
 }
