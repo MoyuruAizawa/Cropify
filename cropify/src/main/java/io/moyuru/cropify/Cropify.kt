@@ -155,12 +155,19 @@ private suspend fun cropImage(
 ): ImageBitmap {
   return withContext(Dispatchers.IO) {
     val scale = bitmap.width / imageRect.width
+
+    // Calculate crop coordinates and dimensions
+    val x = ((frameRect.left - imageRect.left) * scale).toInt().coerceIn(0, bitmap.width - 1)
+    val y = ((frameRect.top - imageRect.top) * scale).toInt().coerceIn(0, bitmap.height - 1)
+    val width = (frameRect.width * scale).toInt().coerceIn(1, bitmap.width - x)
+    val height = (frameRect.height * scale).toInt().coerceIn(1, bitmap.height - y)
+
     Bitmap.createBitmap(
       bitmap.asAndroidBitmap(),
-      ((frameRect.left - imageRect.left) * scale).toInt(),
-      ((frameRect.top - imageRect.top) * scale).toInt(),
-      (frameRect.width * scale).toInt().coerceIn(1..bitmap.width),
-      (frameRect.height * scale).toInt().coerceIn(1..bitmap.height),
+      x,
+      y,
+      width,
+      height,
     ).asImageBitmap()
   }
 }
