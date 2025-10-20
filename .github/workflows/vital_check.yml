@@ -10,7 +10,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('cropify/build.gradle') }}-${{ hashFiles('build.gradle') }}-${{ hashFiles('settings.gradle') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('cropify/build.gradle.kts') }}-${{ hashFiles('build.gradle.kts') }}-${{ hashFiles('settings.gradle.kts') }}
 
       - uses: actions/setup-java@v3
         with:
