@@ -1,23 +1,24 @@
 [versions]
-agp = "8.12.3"
-androidx-activity-compose = "1.11.0"
-androidx-compose-bom = "2025.10.00"
-androidx-core-ktx = "1.17.0"
-androidx-exifinterface = "1.4.1"
+agp = "9.5.0"
+androidx-activity-compose = "1.13.0"
+androidx-compose-bom = "2026.09.00"
+androidx-core-ktx = "1.19.1"
+androidx-exifinterface = "1.4.2"
 androidx-junit = "1.3.0"
-androidx-lifecycle = "2.9.4"
-androidx-navigation-compose = "2.9.5"
+androidx-lifecycle = "2.11.0"
+androidx-navigation-compose = "2.10.2"
 junit = "4.13.2"
-kotlin = "2.2.20"
-mockk = "1.14.6"
+kotlin = "2.4.21"
+mockk = "1.14.11"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 
 [libraries]
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+
 # AndoidX
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
