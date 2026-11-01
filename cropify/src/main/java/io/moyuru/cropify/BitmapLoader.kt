@@ -11,46 +11,70 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.IntSize
 import java.io.IOException
+import java.io.InputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 internal suspend fun loadImageBitmap(context: Context, uri: Uri): ImageBitmap? {
   return withContext(Dispatchers.IO) {
     val resolver = context.contentResolver
-    BitmapFactory.decodeStream(resolver.openInputStream(uri), Rect(), BitmapFactory.Options())?.asImageBitmap()
+    decodeFullImage({ resolver.openInputStream(uri) }) {
+      BitmapFactory.decodeStream(it, Rect(), BitmapFactory.Options())
+    }?.asImageBitmap()
   }
 }
 
 internal suspend fun loadSampledImageBitmap(context: Context, uri: Uri, requireSize: IntSize): SampledImageBitmap {
   return withContext(Dispatchers.IO) {
     val resolver = context.contentResolver
-    val options = BitmapFactory.Options().apply {
-      inJustDecodeBounds = true
-      BitmapFactory.decodeStream(resolver.openInputStream(uri), Rect(), this)
-    }
-    val inSampleSize = calculateInSampleSize(IntSize(options.outWidth, options.outHeight), requireSize)
-    options.apply {
-      inJustDecodeBounds = false
-      this.inSampleSize = inSampleSize
-    }
-
-    resolver.openInputStream(uri).use {
-      if (it == null) {
-        throw IOException("Failed to open input stream.")
+    val options = BitmapFactory.Options()
+    val sample = decodeSampledImage(
+      openStream = { resolver.openInputStream(uri) },
+      requireSize = requireSize,
+      readBounds = {
+        options.inJustDecodeBounds = true
+        BitmapFactory.decodeStream(it, Rect(), options)
+        IntSize(options.outWidth, options.outHeight)
+      },
+      readOrientation = {
+        ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+      },
+      decode = { stream, inSampleSize ->
+        options.inJustDecodeBounds = false
+        options.inSampleSize = inSampleSize
+        BitmapFactory.decodeStream(stream, Rect(), options)
       }
-
-      val exif = ExifInterface(it)
-      val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-
-      val bitmap = BitmapFactory.decodeStream(resolver.openInputStream(uri), Rect(), options)
-        ?: throw IOException("Failed to decode stream.")
-
-      SampledImageBitmap(
-        imageBitmap = applyExifOrientation(bitmap, orientation).asImageBitmap(),
-        inSampleSize = inSampleSize
-      )
-    }
+    )
+    SampledImageBitmap(
+      imageBitmap = applyExifOrientation(sample.bitmap, sample.orientation).asImageBitmap(),
+      inSampleSize = sample.inSampleSize
+    )
   }
+}
+
+internal fun <B : Any> decodeFullImage(
+  openStream: () -> InputStream?,
+  decode: (InputStream?) -> B?
+): B? = openStream().use(decode)
+
+internal data class DecodedSample<B : Any>(val bitmap: B, val orientation: Int, val inSampleSize: Int)
+
+internal fun <B : Any> decodeSampledImage(
+  openStream: () -> InputStream?,
+  requireSize: IntSize,
+  readBounds: (InputStream?) -> IntSize,
+  readOrientation: (InputStream) -> Int,
+  decode: (InputStream?, inSampleSize: Int) -> B?
+): DecodedSample<B> {
+  val imageSize = openStream().use(readBounds)
+  val inSampleSize = calculateInSampleSize(imageSize, requireSize)
+  val orientation = openStream().use {
+    if (it == null) throw IOException("Failed to open input stream.")
+    readOrientation(it)
+  }
+  val bitmap = openStream().use { decode(it, inSampleSize) }
+    ?: throw IOException("Failed to decode stream.")
+  return DecodedSample(bitmap, orientation, inSampleSize)
 }
 
 internal fun calculateInSampleSize(imageSize: IntSize, requireSize: IntSize): Int {
